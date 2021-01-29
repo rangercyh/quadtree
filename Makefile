@@ -1,7 +1,9 @@
-all : Quadtree.so
+all : quadtree.so
 
-Quadtree.so: Quadtree.c IntList.c
-	gcc -fPIC -shared $^ -o $@
+CFLAGS = -g3 -O2 -rdynamic -Wall -fPIC -shared
+
+quadtree.so: luabinding.c Quadtree.c IntList.c
+	gcc $(CFLAGS) -o $@ $^
 
 clean :
-	rm Quadtree.so
+	rm quadtree.so

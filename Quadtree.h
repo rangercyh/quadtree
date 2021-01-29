@@ -4,9 +4,9 @@
 #include "IntList.h"
 
 #ifdef __cplusplus
-    #define QTREE_FUNC extern "C"
+#define QTREE_FUNC extern "C"
 #else
-    #define QTREE_FUNC
+#define QTREE_FUNC
 #endif
 
 typedef struct Quadtree Quadtree;
