@@ -2,9 +2,9 @@
 #define INT_LIST_H
 
 #ifdef __cplusplus
-    #define IL_FUNC extern "C"
+#define IL_FUNC extern "C"
 #else
-    #define IL_FUNC
+#define IL_FUNC
 #endif
 
 typedef struct IntList IntList;

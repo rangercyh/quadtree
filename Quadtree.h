@@ -44,7 +44,7 @@ struct Quadtree
 typedef void QtNodeFunc(Quadtree* qt, void* user_data, int node, int depth, int mx, int my, int sx, int sy);
 
 // Creates a quadtree with the requested extents, maximum elements per leaf, and maximum tree depth.
-QTREE_FUNC void qt_create(Quadtree* qt, int x1, int y1, int x2, int y2, int max_elements, int max_depth);
+QTREE_FUNC void qt_create(Quadtree* qt, int width, int height, int max_elements, int max_depth);
 
 // Destroys the quadtree.
 QTREE_FUNC void qt_destroy(Quadtree* qt);

@@ -204,7 +204,7 @@ static void node_insert(Quadtree* qt, int index, int depth, int mx, int my, int 
     il_destroy(&leaves);
 }
 
-void qt_create(Quadtree* qt, int x1, int y1, int x2, int y2, int max_elements, int max_depth)
+void qt_create(Quadtree* qt, int width, int height, int max_elements, int max_depth)
 {
     qt->max_elements = max_elements;
     qt->max_depth = max_depth;
@@ -220,14 +220,10 @@ void qt_create(Quadtree* qt, int x1, int y1, int x2, int y2, int max_elements, i
     il_set(&qt->nodes, 0, node_idx_num, 0);
 
     // Set the extents of the root node.
-    int half_width = (x2-x1) >> 1;
-    int half_height = (y2-y1) >> 1;
-    qt->root_sx = half_width;
-    qt->root_sy = half_height;
-
-    // Center
-    qt->root_mx = x1 + half_width;
-    qt->root_my = y1 + half_height;
+    qt->root_mx = width >> 1;
+    qt->root_my = height >> 1;
+    qt->root_sx = qt->root_mx;
+    qt->root_sy = qt->root_my;
 }
 
 void qt_destroy(Quadtree* qt)
