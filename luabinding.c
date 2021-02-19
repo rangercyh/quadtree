@@ -12,6 +12,8 @@ extern "C" {
 #define LUA_LIB_API extern
 #endif
 
+static IntList out_put;
+
 #define MT_NAME ("_quadtree_metatable")
 
 static inline int
@@ -74,16 +76,28 @@ quad_query(lua_State *L) {
     if (!check_in_map(x2, y2, qt->root_sx << 1, qt->root_sy << 1)) {
         luaL_error(L, "Position (%d,%d) is out of map", x2, y2);
     }
-    struct IntList *out_put = malloc(sizeof(struct IntList));
-    il_create(out_put, 1);
-    qt_query(qt, out_put, x1, y1, x2, y2, -1);
+    qt_query(qt, &out_put, x1, y1, x2, y2, -1);
     lua_newtable(L);
-    for (int i = 0; i < il_size(out_put); i++) {
-        lua_pushinteger(L, il_get(out_put, i, 0));
+    for (int i = 0; i < il_size(&out_put); i++) {
+        lua_pushinteger(L, il_get(&out_put, i, 0));
         lua_rawseti(L, -2, i + 1);
     }
-    il_destroy(out_put);
-    free(out_put);
+    return 1;
+}
+
+static int
+quad_traverse(lua_State *L) {
+    // struct Quadtree *qt = luaL_checkudata(L, 1, MT_NAME);
+    // struct IntList *out_put = malloc(sizeof(struct IntList));
+    // il_create(out_put, 1);
+    // qt_traverse(qt, out_put, check_collision, check_collision)
+    // lua_newtable(L);
+    // for (int i = 0; i < il_size(out_put); i++) {
+    //     lua_pushinteger(L, il_get(out_put, i, 0));
+    //     lua_rawseti(L, -2, i + 1);
+    // }
+    // il_destroy(out_put);
+    // free(out_put);
     return 1;
 }
 
@@ -102,6 +116,7 @@ lmetatable(lua_State *L) {
             { "remove", quad_remove },
             { "cleanup", quad_cleanup },
             { "query", quad_query },
+            { "traverse", quad_traverse },
             { NULL, NULL }
         };
         luaL_newlib(L, l);
@@ -131,6 +146,7 @@ lnew(lua_State *L) {
 
 LUA_LIB_API int
 luaopen_quadtree(lua_State* L) {
+    il_create(&out_put, 1);
     luaL_checkversion(L);
     luaL_Reg l[] = {
         { "new", lnew },
