@@ -11,9 +11,9 @@ quadtree: quadtree.so
 quadtree.so: quadtree/luabinding.c quadtree/Quadtree.c int_list/IntList.c
 	gcc $(CFLAGS) -I$(IntListInclude) -o $@ $^
 
-uniform_grid: uniform_grid.so
-uniform_grid.so: uniform_grid/UGrid.cpp
-	g++ $(CPPFLAGS) -I$(SmallListInclude) -o $@ $^
+uniform_grid: ugrid.so
+ugrid.so: uniform_grid/luabinding.c uniform_grid/ugrid.c uniform_grid/elt_free_list.c int_list/IntList.c
+	gcc $(CFLAGS) -I$(IntListInclude) -o $@ $^
 
 loose_tight_double_grid: loose_tight_double_grid.so
 loose_tight_double_grid.so: loose_tight_double_grid/LGrid.cpp

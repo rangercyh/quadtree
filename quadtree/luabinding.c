@@ -85,21 +85,21 @@ quad_query(lua_State *L) {
     return 1;
 }
 
-static int
-quad_traverse(lua_State *L) {
-    // struct Quadtree *qt = luaL_checkudata(L, 1, MT_NAME);
-    // struct IntList *out_put = malloc(sizeof(struct IntList));
-    // il_create(out_put, 1);
-    // qt_traverse(qt, out_put, check_collision, check_collision)
-    // lua_newtable(L);
-    // for (int i = 0; i < il_size(out_put); i++) {
-    //     lua_pushinteger(L, il_get(out_put, i, 0));
-    //     lua_rawseti(L, -2, i + 1);
-    // }
-    // il_destroy(out_put);
-    // free(out_put);
-    return 1;
-}
+// static int
+// quad_traverse(lua_State *L) {
+//     // struct Quadtree *qt = luaL_checkudata(L, 1, MT_NAME);
+//     // struct IntList *out_put = malloc(sizeof(struct IntList));
+//     // il_create(out_put, 1);
+//     // qt_traverse(qt, out_put, check_collision, check_collision)
+//     // lua_newtable(L);
+//     // for (int i = 0; i < il_size(out_put); i++) {
+//     //     lua_pushinteger(L, il_get(out_put, i, 0));
+//     //     lua_rawseti(L, -2, i + 1);
+//     // }
+//     // il_destroy(out_put);
+//     // free(out_put);
+//     return 1;
+// }
 
 static int
 gc(lua_State *L) {
@@ -116,7 +116,6 @@ lmetatable(lua_State *L) {
             { "remove", quad_remove },
             { "cleanup", quad_cleanup },
             { "query", quad_query },
-            { "traverse", quad_traverse },
             { NULL, NULL }
         };
         luaL_newlib(L, l);
