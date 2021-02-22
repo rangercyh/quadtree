@@ -11,8 +11,7 @@
 
 typedef struct Quadtree Quadtree;
 
-struct Quadtree
-{
+struct Quadtree {
     // Stores all the nodes in the quadtree. The first node in this
     // sequence is always the root.
     IntList nodes;

@@ -8,10 +8,9 @@
 #endif
 
 typedef struct IntList IntList;
-enum {il_fixed_cap = 128};
+enum { il_fixed_cap = 128 };
 
-struct IntList
-{
+struct IntList {
     // Stores a fixed-size buffer in advance to avoid requiring
     // a heap allocation until we run out of space.
     int fixed[il_fixed_cap];

@@ -135,7 +135,7 @@ SmallList<T>::SmallList(const SmallList& other)
         ld.data = ld.buf;
     } else {
         reserve(other.ld.num);
-        for (int j=0; j < other.size(); ++j) {
+        for (int j = 0; j < other.size(); ++j) {
             ld.data[j] = other.ld.data[j];
         }
         ld.num = other.ld.num;

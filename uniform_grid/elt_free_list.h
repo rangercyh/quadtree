@@ -10,8 +10,7 @@
 typedef struct Elt Elt;
 typedef struct EltFreeList EltFreeList;
 
-struct Elt
-{
+struct Elt {
     // Stores the next element in the cell.
     int next;
 
@@ -23,10 +22,9 @@ struct Elt
     float mx, my;
 };
 
-enum {fixed_cap = 128};
+enum { fixed_cap = 128 };
 
-struct EltFreeList
-{
+struct EltFreeList {
     // Stores a fixed-size buffer in advance to avoid requiring
     // a heap allocation until we run out of space.
     Elt fixed[fixed_cap];
