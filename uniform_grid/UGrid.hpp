@@ -6,8 +6,7 @@
 
 #include "SmallList.hpp"
 
-struct UGridElt
-{
+struct UGridElt {
     // Stores the next element in the cell.
     int next;
 
@@ -19,8 +18,7 @@ struct UGridElt
     float mx, my;
 };
 
-struct UGridRow
-{
+struct UGridRow {
     // Stores all the elements in the grid row.
     FreeList<UGridElt> elts;
 
@@ -32,8 +30,7 @@ struct UGridRow
     int num_elts;
 };
 
-struct UGrid
-{
+struct UGrid {
     // Stores all the rows in the grid.
     UGridRow* rows;
 
@@ -44,7 +41,7 @@ struct UGrid
     float inv_cell_w, inv_cell_h;
 
     // Stores the half-size of all elements stored in the grid.
-    float hx, hy;
+    float radius;
 
     // Stores the upper-left corner of the grid.
     float x, y;
@@ -56,17 +53,11 @@ struct UGrid
 // Returns a new grid storing elements that have a uniform upper-bound size. Because
 // all elements are treated uniformly-sized for the sake of search queries, each one
 // can be stored as a single point in the grid.
-UGrid* ugrid_create(float hx, float hy, float cell_w, float cell_h,
+UGrid* ugrid_create(float radius, float cell_w, float cell_h,
                     float l, float t, float r, float b);
 
 // Destroys the grid.
 void ugrid_destroy(UGrid* grid);
-
-// Returns the grid cell X index for the specified position.
-int ugrid_cell_x(const UGrid* grid, float x);
-
-// Returns the grid cell Y index for the specified position.
-int ugrid_cell_y(const UGrid* grid, float y);
 
 // Inserts an element to the grid.
 void ugrid_insert(UGrid* grid, int id, float mx, float my);
@@ -79,7 +70,7 @@ void ugrid_move(UGrid* grid, int id, float prev_mx, float prev_my, float mx, flo
 
 // Returns all the element IDs that intersect the specified rectangle excluding
 // elements with the specified ID to omit.
-SmallList<int> ugrid_query(const UGrid* grid, float mx, float my, float hx, float hy, int omit_id);
+SmallList<int> ugrid_query(const UGrid* grid, float mx, float my, float radius, int omit_id);
 
 // Returns true if the specified element position is inside the grid boundaries.
 bool ugrid_in_bounds(const UGrid* grid, float mx, float my);

@@ -26,7 +26,8 @@ for k, v in pairs(t) do
 end
 qt:cleanup()
 
-local uniform_grid = require("ugrid")
+-- local uniform_grid = require("ugrid")
+local uniform_grid = require("ugrid2")
 
 local ugrid = uniform_grid.new({
     r = 10, cw = 10, ch = 10,

@@ -9,12 +9,11 @@ static int ceil_div(float value, float divisor)
     // Returns the value divided by the divisor rounded up.
     const float resultf = value / divisor;
     const int result = (int)resultf;
-    return result < resultf ? result+1: result;
+    return result < resultf ? result + 1: result;
 }
 
 static int min_int(int a, int b)
 {
-    assert(sizeof(int) == 4);
     a -= b;
     a &= a >> 31;
     return a + b;
@@ -22,7 +21,6 @@ static int min_int(int a, int b)
 
 static int max_int(int a, int b)
 {
-    assert(sizeof(int) == 4);
     a -= b;
     a &= (~a) >> 31;
     return a + b;
@@ -34,7 +32,17 @@ static int to_cell_idx(float val, float inv_cell_size, int num_cells)
     return min_int(max_int(cell_pos, 0), num_cells - 1);
 }
 
-UGrid* ugrid_create(float hx, float hy, float cell_w, float cell_h,
+static int ugrid_cell_x(const UGrid* grid, float x)
+{
+    return to_cell_idx(x - grid->x, grid->inv_cell_w, grid->num_cols);
+}
+
+static int ugrid_cell_y(const UGrid* grid, float y)
+{
+    return to_cell_idx(y - grid->y, grid->inv_cell_h, grid->num_rows);
+}
+
+UGrid* ugrid_create(float radius, float cell_w, float cell_h,
                     float l, float t, float r, float b)
 {
     const float w = r - l, h = b - t;
@@ -50,8 +58,7 @@ UGrid* ugrid_create(float hx, float hy, float cell_w, float cell_h,
     grid->y = t;
     grid->h = w;
     grid->w = h;
-    grid->hx = hx;
-    grid->hy = hy;
+    grid->radius = radius;
 
     grid->rows = new UGridRow[num_rows];
     for (int r=0; r < num_rows; ++r)
@@ -71,15 +78,6 @@ void ugrid_destroy(UGrid* grid)
     delete grid;
 }
 
-int ugrid_cell_x(const UGrid* grid, float x)
-{
-    return to_cell_idx(x - grid->x, grid->inv_cell_w, grid->num_cols);
-}
-
-int ugrid_cell_y(const UGrid* grid, float y)
-{
-    return to_cell_idx(y - grid->y, grid->inv_cell_h, grid->num_rows);
-}
 
 void ugrid_insert(UGrid* grid, int id, float mx, float my)
 {
@@ -115,7 +113,7 @@ void ugrid_move(UGrid* grid, int id, float prev_mx, float prev_my, float mx, flo
     const int next_cell_y = ugrid_cell_y(grid, my);
     UGridRow* prev_row = &grid->rows[prev_cell_y];
 
-    if (next_cell_x == prev_cell_y && next_cell_x == next_cell_y)
+    if (next_cell_x == prev_cell_x && next_cell_y == prev_cell_y)
     {
         // If the element will still belong in the same cell, simply update its position.
         int elt_idx = prev_row->cells[prev_cell_x];
@@ -151,18 +149,17 @@ void ugrid_move(UGrid* grid, int id, float prev_mx, float prev_my, float mx, flo
     }
 }
 
-SmallList<int> ugrid_query(const UGrid* grid, float mx, float my, float hx, float hy, int omit_id)
+SmallList<int> ugrid_query(const UGrid* grid, float mx, float my, float radius, int omit_id)
 {
     // Expand the size of the query by the upper-bound uniform size of the elements. This
     // expansion is what allows us to find elements based only on their point.
-    const float fx = hx + grid->hx;
-    const float fy = hy + grid->hy;
+    const float check_radius = radius + grid->radius;
 
     // Find the cells that intersect the search query.
-    const int min_x = ugrid_cell_x(grid, mx - fx);
-    const int min_y = ugrid_cell_y(grid, my - fy);
-    const int max_x = ugrid_cell_x(grid, mx + fx);
-    const int max_y = ugrid_cell_y(grid, my + fy);
+    const int min_x = ugrid_cell_x(grid, mx - check_radius);
+    const int min_y = ugrid_cell_y(grid, my - check_radius);
+    const int max_x = ugrid_cell_x(grid, mx + check_radius);
+    const int max_y = ugrid_cell_y(grid, my + check_radius);
 
     // Find the elements that intersect the search query.
     SmallList<int> res;
@@ -175,8 +172,8 @@ SmallList<int> ugrid_query(const UGrid* grid, float mx, float my, float hx, floa
             while (elt_idx != -1)
             {
                 const UGridElt* elt = &row->elts[elt_idx];
-                if (elt_idx != omit_id && fabs(mx - elt->mx) <= fx && fabs(my - elt->my) <= fy)
-                    res.push_back(elt_idx);
+                if (elt->id != omit_id && fabs(mx - elt->mx) <= check_radius && fabs(my - elt->my) <= check_radius)
+                    res.push_back(elt->id);
                 elt_idx = row->elts[elt_idx].next;
             }
         }
@@ -188,8 +185,8 @@ bool ugrid_in_bounds(const UGrid* grid, float mx, float my)
 {
     mx -= grid->x;
     my -= grid->y;
-    const float x1 = mx-grid->hx, y1 = my-grid->hy;
-    const float x2 = mx+grid->hx, y2 = my+grid->hy;
+    const float x1 = mx - grid->radius, y1 = my - grid->radius;
+    const float x2 = mx + grid->radius, y2 = my + grid->radius;
     return x1 >= 0.0f && x2 < grid->w && y1 >= 0.0f && y2 < grid->h;
 }
 
