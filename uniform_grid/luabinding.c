@@ -122,7 +122,7 @@ static int
 lnew(lua_State *L) {
     luaL_checktype(L, 1, LUA_TTABLE);
     lua_settop(L, 1);
-    float radius = getfield(L, "r");
+    float radius = getfield(L, "radius");
     float cell_w = getfield(L, "cw");
     float cell_h = getfield(L, "ch");
     float l = getfield(L, "l");

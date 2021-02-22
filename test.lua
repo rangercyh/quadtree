@@ -30,7 +30,7 @@ qt:cleanup()
 local uniform_grid = require("ugrid2")
 
 local ugrid = uniform_grid.new({
-    r = 10, cw = 10, ch = 10,
+    radius = 10, cw = 10, ch = 10,
     l = 0, t = 0, r = 1000, b = 1000,
 })
 print('insert idx = ', ugrid:insert(1, 0, 0))
@@ -39,7 +39,7 @@ print('insert idx = ', ugrid:insert(3, 100.2, 88))
 print('insert idx = ', ugrid:insert(4, 999999, 999999))
 ugrid:optimize()
 print("in in_bounds = ", ugrid:in_bounds(9999, 999990))
-print("in in_bounds = ", ugrid:in_bounds(999, 990))
+print("in in_bounds = ", ugrid:in_bounds(99, 980))
 ugrid:remove(1, 0, 0)
 ugrid:remove(3, 100.2, 88)
 local t = ugrid:query(0, 0, 0, 200)
