@@ -132,15 +132,8 @@ void ugrid_move(UGrid* grid, int id, float prev_mx, float prev_my, float mx, flo
             const int elt_idx = *link;
             *link = elt->next;
             efl_remove(prev_row->efl, elt_idx);
-
-            // Update the element's position.
-            elt->mx = mx;
-            elt->my = my;
-
-            // Insert it to the new row and cell.
-            elt->next = next_row->cells[next_cell_x];
             next_row->cells[next_cell_x] =  efl_insert(next_row->efl, elt->id, elt->mx,
-                    elt->my, elt->next);
+                    elt->my, next_row->cells[next_cell_x]);
         }
     }
 }
