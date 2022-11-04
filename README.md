@@ -13,3 +13,9 @@
 主要考虑将来做碰撞计算的时候可能用得上，抽空导出lua接口。
 
 发现有人已经写了unity的例子，不过我主要用在服务器计算，还是得写一遍c跟lua的：https://github.com/Appleguysnake/DragonSpace-Demo
+
+# 给我们游戏服务器写了一个 aoi 的例子跟测试，可以参考一下：
+
+https://github.com/Lyra-Game/aoi
+
+https://github.com/Lyra-Game/aoi_test
