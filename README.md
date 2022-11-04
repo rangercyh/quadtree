@@ -14,7 +14,7 @@
 
 发现有人已经写了unity的例子，不过我主要用在服务器计算，还是得写一遍c跟lua的：https://github.com/Appleguysnake/DragonSpace-Demo
 
-## 给我们游戏服务器写了一个用 uniform_grid 实现 aoi 的例子跟测试，可以参考一下：
+## 给我们游戏服务器写了一个用 uniform_grid 实现 aoi 的例子仅供参考：
 
 https://github.com/Lyra-Game/aoi
 
