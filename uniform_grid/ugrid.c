@@ -184,21 +184,21 @@ void ugrid_optimize(UGrid* grid) {
         for (int c = 0; c < grid->num_cols; ++c) {
             // Replace links to the old elements list to links in the new
             // cache-friendly element list.
-            IntList new_elt_idxs;
-            il_create(&new_elt_idxs, 1);
+            IntList *new_elt_idxs = il_create(1);
             int* link = &row->cells[c];
             while (*link != -1) {
                 const Elt* elt = efl_get(row->efl, *link);
-                il_set(&new_elt_idxs, il_push_back(&new_elt_idxs), 0,
+                il_set(new_elt_idxs, il_push_back(new_elt_idxs), 0,
                         efl_insert(new_efl, elt->id, elt->mx, elt->my, elt->next));
                 *link = elt->next;
             }
-            for (int j = 0; j < il_size(&new_elt_idxs); ++j) {
-                const int new_elt_idx = il_get(&new_elt_idxs, j, 0);
+            for (int j = 0; j < il_size(new_elt_idxs); ++j) {
+                const int new_elt_idx = il_get(new_elt_idxs, j, 0);
                 Elt* elt = efl_get(new_efl, new_elt_idx);
                 elt->next = *link;
                 *link = new_elt_idx;
             }
+            il_destroy(new_elt_idxs);
         }
         efl_destroy(row->efl);
         row->efl = new_efl;

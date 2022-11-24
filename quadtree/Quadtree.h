@@ -14,13 +14,13 @@ typedef struct Quadtree Quadtree;
 struct Quadtree {
     // Stores all the nodes in the quadtree. The first node in this
     // sequence is always the root.
-    IntList nodes;
+    IntList *nodes;
 
     // Stores all the elements in the quadtree.
-    IntList elts;
+    IntList *elts;
 
     // Stores all the element nodes in the quadtree.
-    IntList enodes;
+    IntList *enodes;
 
     // Stores the quadtree extents.
     int root_mx, root_my, root_sx, root_sy;

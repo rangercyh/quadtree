@@ -12,7 +12,7 @@ extern "C" {
 #define LUA_LIB_API extern
 #endif
 
-static IntList out_put;
+static IntList *out_put;
 
 #define MT_NAME ("_ugrid_metatable")
 
@@ -65,10 +65,10 @@ gd_query(lua_State *L) {
     float x = luaL_checknumber(L, 3);
     float y = luaL_checknumber(L, 4);
     float r = luaL_checknumber(L, 5);
-    ugrid_query(ugrid, &out_put, x, y, r, idx);
+    ugrid_query(ugrid, out_put, x, y, r, idx);
     lua_newtable(L);
-    for (int i = 0; i < il_size(&out_put); i++) {
-        lua_pushinteger(L, il_get(&out_put, i, 0));
+    for (int i = 0; i < il_size(out_put); i++) {
+        lua_pushinteger(L, il_get(out_put, i, 0));
         lua_rawseti(L, -2, i + 1);
     }
     return 1;
@@ -139,7 +139,7 @@ lnew(lua_State *L) {
 
 LUA_LIB_API int
 luaopen_ugrid(lua_State* L) {
-    il_create(&out_put, 1);
+    out_put = il_create(1);
     luaL_checkversion(L);
     luaL_Reg l[] = {
         { "new", lnew },

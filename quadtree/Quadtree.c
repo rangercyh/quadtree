@@ -62,53 +62,52 @@ static int intersect(int l1, int t1, int r1, int b1,
 
 void leaf_insert(Quadtree* qt, int node, int depth, int mx, int my, int sx, int sy, int element) {
     // Insert the element node to the leaf.
-    const int nd_fc = il_get(&qt->nodes, node, node_idx_fc);
-    il_set(&qt->nodes, node, node_idx_fc, il_insert(&qt->enodes));
-    il_set(&qt->enodes, il_get(&qt->nodes, node, node_idx_fc), enode_idx_next, nd_fc);
-    il_set(&qt->enodes, il_get(&qt->nodes, node, node_idx_fc), enode_idx_elt, element);
+    const int nd_fc = il_get(qt->nodes, node, node_idx_fc);
+    il_set(qt->nodes, node, node_idx_fc, il_insert(qt->enodes));
+    il_set(qt->enodes, il_get(qt->nodes, node, node_idx_fc), enode_idx_next, nd_fc);
+    il_set(qt->enodes, il_get(qt->nodes, node, node_idx_fc), enode_idx_elt, element);
 
     // If the leaf is full, split it.
-    if (il_get(&qt->nodes, node, node_idx_num) == qt->max_elements && depth < qt->max_depth) {
+    if (il_get(qt->nodes, node, node_idx_num) == qt->max_elements && depth < qt->max_depth) {
         int fc = 0, j = 0;
-        IntList elts = {0};
-        il_create(&elts, 1);
+        IntList *elts = il_create(1);
 
         // Transfer elements from the leaf node to a list of elements.
-        while (il_get(&qt->nodes, node, node_idx_fc) != -1) {
-            const int index = il_get(&qt->nodes, node, node_idx_fc);
-            const int next_index = il_get(&qt->enodes, index, enode_idx_next);
-            const int elt = il_get(&qt->enodes, index, enode_idx_elt);
+        while (il_get(qt->nodes, node, node_idx_fc) != -1) {
+            const int index = il_get(qt->nodes, node, node_idx_fc);
+            const int next_index = il_get(qt->enodes, index, enode_idx_next);
+            const int elt = il_get(qt->enodes, index, enode_idx_elt);
 
             // Pop off the element node from the leaf and remove it from the qt.
-            il_set(&qt->nodes, node, node_idx_fc, next_index);
-            il_erase(&qt->enodes, index);
+            il_set(qt->nodes, node, node_idx_fc, next_index);
+            il_erase(qt->enodes, index);
 
             // Insert element to the list.
-            il_set(&elts, il_push_back(&elts), 0, elt);
+            il_set(elts, il_push_back(elts), 0, elt);
         }
 
         // Start by allocating 4 child nodes.
-        fc = il_insert(&qt->nodes);
-        il_insert(&qt->nodes);
-        il_insert(&qt->nodes);
-        il_insert(&qt->nodes);
-        il_set(&qt->nodes, node, node_idx_fc, fc);
+        fc = il_insert(qt->nodes);
+        il_insert(qt->nodes);
+        il_insert(qt->nodes);
+        il_insert(qt->nodes);
+        il_set(qt->nodes, node, node_idx_fc, fc);
 
         // Initialize the new child nodes.
         for (j = 0; j < 4; ++j) {
-            il_set(&qt->nodes, fc+j, node_idx_fc, -1);
-            il_set(&qt->nodes, fc+j, node_idx_num, 0);
+            il_set(qt->nodes, fc+j, node_idx_fc, -1);
+            il_set(qt->nodes, fc+j, node_idx_num, 0);
         }
 
         // Transfer the elements in the former leaf node to its new children.
-        il_set(&qt->nodes, node, node_idx_num, -1);
-        for (j = 0; j < il_size(&elts); ++j) {
-            node_insert(qt, node, depth, mx, my, sx, sy, il_get(&elts, j, 0));
+        il_set(qt->nodes, node, node_idx_num, -1);
+        for (j = 0; j < il_size(elts); ++j) {
+            node_insert(qt, node, depth, mx, my, sx, sy, il_get(elts, j, 0));
         }
-        il_destroy(&elts);
+        il_destroy(elts);
     } else {
         // Increment the leaf element count.
-        il_set(&qt->nodes, node, node_idx_num, il_get(&qt->nodes, node, node_idx_num) + 1);
+        il_set(qt->nodes, node, node_idx_num, il_get(qt->nodes, node, node_idx_num) + 1);
     }
 }
 
@@ -125,72 +124,70 @@ static void push_node(IntList* nodes, int nd_index, int nd_depth, int nd_mx, int
 static void find_leaves(IntList* out, const Quadtree* qt, int node, int depth,
                         int mx, int my, int sx, int sy,
                         int lft, int top, int rgt, int btm) {
-    IntList to_process = {0};
-    il_create(&to_process, nd_num);
-    push_node(&to_process, node, depth, mx, my, sx, sy);
+    IntList *to_process = il_create(nd_num);
+    push_node(to_process, node, depth, mx, my, sx, sy);
 
-    while (il_size(&to_process) > 0) {
-        const int back_idx = il_size(&to_process) - 1;
-        const int nd_mx = il_get(&to_process, back_idx, nd_idx_mx);
-        const int nd_my = il_get(&to_process, back_idx, nd_idx_my);
-        const int nd_sx = il_get(&to_process, back_idx, nd_idx_sx);
-        const int nd_sy = il_get(&to_process, back_idx, nd_idx_sy);
-        const int nd_index = il_get(&to_process, back_idx, nd_idx_index);
-        const int nd_depth = il_get(&to_process, back_idx, nd_idx_depth);
-        il_pop_back(&to_process);
+    while (il_size(to_process) > 0) {
+        const int back_idx = il_size(to_process) - 1;
+        const int nd_mx = il_get(to_process, back_idx, nd_idx_mx);
+        const int nd_my = il_get(to_process, back_idx, nd_idx_my);
+        const int nd_sx = il_get(to_process, back_idx, nd_idx_sx);
+        const int nd_sy = il_get(to_process, back_idx, nd_idx_sy);
+        const int nd_index = il_get(to_process, back_idx, nd_idx_index);
+        const int nd_depth = il_get(to_process, back_idx, nd_idx_depth);
+        il_pop_back(to_process);
 
         // If this node is a leaf, insert it to the list.
-        if (il_get(&qt->nodes, nd_index, node_idx_num) != -1) {
+        if (il_get(qt->nodes, nd_index, node_idx_num) != -1) {
             push_node(out, nd_index, nd_depth, nd_mx, nd_my, nd_sx, nd_sy);
         } else {
             // Otherwise push the children that intersect the rectangle.
-            const int fc = il_get(&qt->nodes, nd_index, node_idx_fc);
+            const int fc = il_get(qt->nodes, nd_index, node_idx_fc);
             const int hx = nd_sx >> 1, hy = nd_sy >> 1;
             const int l = nd_mx-hx, t = nd_my-hy, r = nd_mx+hx, b = nd_my+hy;
 
             if (top <= nd_my) {
                 if (lft <= nd_mx) {
-                    push_node(&to_process, fc+0, nd_depth+1, l,t,hx,hy);
+                    push_node(to_process, fc+0, nd_depth+1, l,t,hx,hy);
                 }
                 if (rgt > nd_mx) {
-                    push_node(&to_process, fc+1, nd_depth+1, r,t,hx,hy);
+                    push_node(to_process, fc+1, nd_depth+1, r,t,hx,hy);
                 }
             }
             if (btm > nd_my) {
                 if (lft <= nd_mx) {
-                    push_node(&to_process, fc+2, nd_depth+1, l,b,hx,hy);
+                    push_node(to_process, fc+2, nd_depth+1, l,b,hx,hy);
                 }
                 if (rgt > nd_mx) {
-                    push_node(&to_process, fc+3, nd_depth+1, r,b,hx,hy);
+                    push_node(to_process, fc+3, nd_depth+1, r,b,hx,hy);
                 }
             }
         }
     }
-    il_destroy(&to_process);
+    il_destroy(to_process);
 }
 
 static void node_insert(Quadtree* qt, int index, int depth, int mx, int my, int sx, int sy, int element) {
     // Find the leaves and insert the element to all the leaves found.
     int j = 0;
-    IntList leaves = {0};
+    IntList *leaves = il_create(nd_num);
 
-    const int lft = il_get(&qt->elts, element, elt_idx_lft);
-    const int top = il_get(&qt->elts, element, elt_idx_top);
-    const int rgt = il_get(&qt->elts, element, elt_idx_rgt);
-    const int btm = il_get(&qt->elts, element, elt_idx_btm);
+    const int lft = il_get(qt->elts, element, elt_idx_lft);
+    const int top = il_get(qt->elts, element, elt_idx_top);
+    const int rgt = il_get(qt->elts, element, elt_idx_rgt);
+    const int btm = il_get(qt->elts, element, elt_idx_btm);
 
-    il_create(&leaves, nd_num);
-    find_leaves(&leaves, qt, index, depth, mx, my, sx, sy, lft, top, rgt, btm);
-    for (j = 0; j < il_size(&leaves); ++j) {
-        const int nd_mx = il_get(&leaves, j, nd_idx_mx);
-        const int nd_my = il_get(&leaves, j, nd_idx_my);
-        const int nd_sx = il_get(&leaves, j, nd_idx_sx);
-        const int nd_sy = il_get(&leaves, j, nd_idx_sy);
-        const int nd_index = il_get(&leaves, j, nd_idx_index);
-        const int nd_depth = il_get(&leaves, j, nd_idx_depth);
+    find_leaves(leaves, qt, index, depth, mx, my, sx, sy, lft, top, rgt, btm);
+    for (j = 0; j < il_size(leaves); ++j) {
+        const int nd_mx = il_get(leaves, j, nd_idx_mx);
+        const int nd_my = il_get(leaves, j, nd_idx_my);
+        const int nd_sx = il_get(leaves, j, nd_idx_sx);
+        const int nd_sy = il_get(leaves, j, nd_idx_sy);
+        const int nd_index = il_get(leaves, j, nd_idx_index);
+        const int nd_depth = il_get(leaves, j, nd_idx_depth);
         leaf_insert(qt, nd_index, nd_depth, nd_mx, nd_my, nd_sx, nd_sy, element);
     }
-    il_destroy(&leaves);
+    il_destroy(leaves);
 }
 
 void qt_create(Quadtree* qt, int width, int height, int max_elements, int max_depth) {
@@ -198,14 +195,14 @@ void qt_create(Quadtree* qt, int width, int height, int max_elements, int max_de
     qt->max_depth = max_depth;
     qt->temp = 0;
     qt->temp_size = 0;
-    il_create(&qt->nodes, node_num);
-    il_create(&qt->elts, elt_num);
-    il_create(&qt->enodes, enode_num);
+    qt->nodes = il_create(node_num);
+    qt->elts = il_create(elt_num);
+    qt->enodes = il_create(enode_num);
 
     // Insert the root node to the qt.
-    il_insert(&qt->nodes);
-    il_set(&qt->nodes, 0, node_idx_fc, -1);
-    il_set(&qt->nodes, 0, node_idx_num, 0);
+    il_insert(qt->nodes);
+    il_set(qt->nodes, 0, node_idx_fc, -1);
+    il_set(qt->nodes, 0, node_idx_num, 0);
 
     // Set the extents of the root node.
     qt->root_mx = width >> 1;
@@ -215,22 +212,22 @@ void qt_create(Quadtree* qt, int width, int height, int max_elements, int max_de
 }
 
 void qt_destroy(Quadtree* qt) {
-    il_destroy(&qt->nodes);
-    il_destroy(&qt->elts);
-    il_destroy(&qt->enodes);
+    il_destroy(qt->nodes);
+    il_destroy(qt->elts);
+    il_destroy(qt->enodes);
     free(qt->temp);
 }
 
 int qt_insert(Quadtree* qt, int id, int x1, int y1, int x2, int y2) {
     // Insert a new element.
-    const int new_element = il_insert(&qt->elts);
+    const int new_element = il_insert(qt->elts);
 
     // Set the fields of the new element.
-    il_set(&qt->elts, new_element, elt_idx_lft, x1);
-    il_set(&qt->elts, new_element, elt_idx_top, y1);
-    il_set(&qt->elts, new_element, elt_idx_rgt, x2);
-    il_set(&qt->elts, new_element, elt_idx_btm, y2);
-    il_set(&qt->elts, new_element, elt_idx_id, id);
+    il_set(qt->elts, new_element, elt_idx_lft, x1);
+    il_set(qt->elts, new_element, elt_idx_top, y1);
+    il_set(qt->elts, new_element, elt_idx_rgt, x2);
+    il_set(qt->elts, new_element, elt_idx_btm, y2);
+    il_set(qt->elts, new_element, elt_idx_id, id);
 
     // Insert the element to the appropriate leaf node(s).
     node_insert(qt, 0, 0, qt->root_mx, qt->root_my, qt->root_sx, qt->root_sy, new_element);
@@ -240,53 +237,52 @@ int qt_insert(Quadtree* qt, int id, int x1, int y1, int x2, int y2) {
 void qt_remove(Quadtree* qt, int element) {
     // Find the leaves.
     int j = 0;
-    IntList leaves = {0};
+    IntList *leaves = il_create(nd_num);
 
-    const int lft = il_get(&qt->elts, element, elt_idx_lft);
-    const int top = il_get(&qt->elts, element, elt_idx_top);
-    const int rgt = il_get(&qt->elts, element, elt_idx_rgt);
-    const int btm = il_get(&qt->elts, element, elt_idx_btm);
+    const int lft = il_get(qt->elts, element, elt_idx_lft);
+    const int top = il_get(qt->elts, element, elt_idx_top);
+    const int rgt = il_get(qt->elts, element, elt_idx_rgt);
+    const int btm = il_get(qt->elts, element, elt_idx_btm);
 
-    il_create(&leaves, nd_num);
-    find_leaves(&leaves, qt, 0, 0, qt->root_mx, qt->root_my, qt->root_sx, qt->root_sy, lft, top, rgt, btm);
+    find_leaves(leaves, qt, 0, 0, qt->root_mx, qt->root_my, qt->root_sx, qt->root_sy, lft, top, rgt, btm);
 
     // For each leaf node, remove the element node.
-    for (j = 0; j < il_size(&leaves); ++j) {
-        const int nd_index = il_get(&leaves, j, nd_idx_index);
+    for (j = 0; j < il_size(leaves); ++j) {
+        const int nd_index = il_get(leaves, j, nd_idx_index);
 
         // Walk the list until we find the element node.
-        int node_index = il_get(&qt->nodes, nd_index, node_idx_fc);
+        int node_index = il_get(qt->nodes, nd_index, node_idx_fc);
         int prev_index = -1;
-        while (node_index != -1 && il_get(&qt->enodes, node_index, enode_idx_elt) != element) {
+        while (node_index != -1 && il_get(qt->enodes, node_index, enode_idx_elt) != element) {
             prev_index = node_index;
-            node_index = il_get(&qt->enodes, node_index, enode_idx_next);
+            node_index = il_get(qt->enodes, node_index, enode_idx_next);
         }
 
         if (node_index != -1) {
             // Remove the element node.
-            const int next_index = il_get(&qt->enodes, node_index, enode_idx_next);
+            const int next_index = il_get(qt->enodes, node_index, enode_idx_next);
             if (prev_index == -1) {
-                il_set(&qt->nodes, nd_index, node_idx_fc, next_index);
+                il_set(qt->nodes, nd_index, node_idx_fc, next_index);
             } else {
-                il_set(&qt->enodes, prev_index, enode_idx_next, next_index);
+                il_set(qt->enodes, prev_index, enode_idx_next, next_index);
             }
-            il_erase(&qt->enodes, node_index);
+            il_erase(qt->enodes, node_index);
 
             // Decrement the leaf element count.
-            il_set(&qt->nodes, nd_index, node_idx_num, il_get(&qt->nodes, nd_index, node_idx_num)-1);
+            il_set(qt->nodes, nd_index, node_idx_num, il_get(qt->nodes, nd_index, node_idx_num)-1);
         }
     }
-    il_destroy(&leaves);
+    il_destroy(leaves);
 
     // Remove the element.
-    il_erase(&qt->elts, element);
+    il_erase(qt->elts, element);
 }
 
 void qt_query(Quadtree* qt, IntList* out, int qlft, int qtop, int qrgt, int qbtm, int omit_element) {
     // Find the leaves that intersect the specified query rectangle.
     int j = 0;
-    IntList leaves = {0};
-    const int elt_cap = il_size(&qt->elts);
+    IntList *leaves = il_create(nd_num);
+    const int elt_cap = il_size(qt->elts);
 
     if (qt->temp_size < elt_cap) {
         qt->temp_size = elt_cap;
@@ -295,29 +291,28 @@ void qt_query(Quadtree* qt, IntList* out, int qlft, int qtop, int qrgt, int qbtm
     }
 
     // For each leaf node, look for elements that intersect.
-    il_create(&leaves, nd_num);
-    find_leaves(&leaves, qt, 0, 0, qt->root_mx, qt->root_my, qt->root_sx, qt->root_sy, qlft, qtop, qrgt, qbtm);
+    find_leaves(leaves, qt, 0, 0, qt->root_mx, qt->root_my, qt->root_sx, qt->root_sy, qlft, qtop, qrgt, qbtm);
 
     il_clear(out);
-    for (j = 0; j < il_size(&leaves); ++j) {
-        const int nd_index = il_get(&leaves, j, nd_idx_index);
+    for (j = 0; j < il_size(leaves); ++j) {
+        const int nd_index = il_get(leaves, j, nd_idx_index);
 
         // Walk the list and add elements that intersect.
-        int elt_node_index = il_get(&qt->nodes, nd_index, node_idx_fc);
+        int elt_node_index = il_get(qt->nodes, nd_index, node_idx_fc);
         while (elt_node_index != -1) {
-            const int element = il_get(&qt->enodes, elt_node_index, enode_idx_elt);
-            const int lft = il_get(&qt->elts, element, elt_idx_lft);
-            const int top = il_get(&qt->elts, element, elt_idx_top);
-            const int rgt = il_get(&qt->elts, element, elt_idx_rgt);
-            const int btm = il_get(&qt->elts, element, elt_idx_btm);
+            const int element = il_get(qt->enodes, elt_node_index, enode_idx_elt);
+            const int lft = il_get(qt->elts, element, elt_idx_lft);
+            const int top = il_get(qt->elts, element, elt_idx_top);
+            const int rgt = il_get(qt->elts, element, elt_idx_rgt);
+            const int btm = il_get(qt->elts, element, elt_idx_btm);
             if (!qt->temp[element] && element != omit_element && intersect(qlft,qtop,qrgt,qbtm, lft,top,rgt,btm)) {
                 il_set(out, il_push_back(out), 0, element);
                 qt->temp[element] = 1;
             }
-            elt_node_index = il_get(&qt->enodes, elt_node_index, enode_idx_next);
+            elt_node_index = il_get(qt->enodes, elt_node_index, enode_idx_next);
         }
     }
-    il_destroy(&leaves);
+    il_destroy(leaves);
 
     // Unmark the elements that were inserted.
     for (j = 0; j < il_size(out); ++j) {
@@ -326,22 +321,21 @@ void qt_query(Quadtree* qt, IntList* out, int qlft, int qtop, int qrgt, int qbtm
 }
 
 void qt_cleanup(Quadtree* qt) {
-    IntList to_process = {0};
-    il_create(&to_process, 1);
+    IntList *to_process = il_create(1);
 
     // Only process the root if it's not a leaf.
-    if (il_get(&qt->nodes, 0, node_idx_num) == -1) {
+    if (il_get(qt->nodes, 0, node_idx_num) == -1) {
         // Push the root index to the stack.
-        il_set(&to_process, il_push_back(&to_process), 0, 0);
+        il_set(to_process, il_push_back(to_process), 0, 0);
     }
 
-    while (il_size(&to_process) > 0) {
+    while (il_size(to_process) > 0) {
         // Pop a node from the stack.
-        const int node = il_get(&to_process, il_size(&to_process)-1, 0);
-        const int fc = il_get(&qt->nodes, node, node_idx_fc);
+        const int node = il_get(to_process, il_size(to_process)-1, 0);
+        const int fc = il_get(qt->nodes, node, node_idx_fc);
         int num_empty_leaves = 0;
         int j = 0;
-        il_pop_back(&to_process);
+        il_pop_back(to_process);
 
         // Loop through the children.
         for (j = 0; j < 4; ++j) {
@@ -350,11 +344,11 @@ void qt_cleanup(Quadtree* qt) {
             // Increment empty leaf count if the child is an empty
             // leaf. Otherwise if the child is a branch, add it to
             // the stack to be processed in the next iteration.
-            if (il_get(&qt->nodes, child, node_idx_num) == 0) {
+            if (il_get(qt->nodes, child, node_idx_num) == 0) {
                 ++num_empty_leaves;
-            } else if (il_get(&qt->nodes, child, node_idx_num) == -1) {
+            } else if (il_get(qt->nodes, child, node_idx_num) == -1) {
                 // Push the child index to the stack.
-                il_set(&to_process, il_push_back(&to_process), 0, child);
+                il_set(to_process, il_push_back(to_process), 0, child);
             }
         }
 
@@ -364,43 +358,42 @@ void qt_cleanup(Quadtree* qt) {
             // Remove all 4 children in reverse order so that they
             // can be reclaimed on subsequent insertions in proper
             // order.
-            il_erase(&qt->nodes, fc + 3);
-            il_erase(&qt->nodes, fc + 2);
-            il_erase(&qt->nodes, fc + 1);
-            il_erase(&qt->nodes, fc + 0);
+            il_erase(qt->nodes, fc + 3);
+            il_erase(qt->nodes, fc + 2);
+            il_erase(qt->nodes, fc + 1);
+            il_erase(qt->nodes, fc + 0);
 
             // Make this node the new empty leaf.
-            il_set(&qt->nodes, node, node_idx_fc, -1);
-            il_set(&qt->nodes, node, node_idx_num, 0);
+            il_set(qt->nodes, node, node_idx_fc, -1);
+            il_set(qt->nodes, node, node_idx_num, 0);
         }
     }
-    il_destroy(&to_process);
+    il_destroy(to_process);
 }
 
 void qt_traverse(Quadtree* qt, void* user_data, QtNodeFunc* branch, QtNodeFunc* leaf) {
-    IntList to_process = {0};
-    il_create(&to_process, nd_num);
-    push_node(&to_process, 0, 0, qt->root_mx, qt->root_my, qt->root_sx, qt->root_sy);
+    IntList *to_process = il_create(nd_num);
+    push_node(to_process, 0, 0, qt->root_mx, qt->root_my, qt->root_sx, qt->root_sy);
 
-    while (il_size(&to_process) > 0) {
-        const int back_idx = il_size(&to_process) - 1;
-        const int nd_mx = il_get(&to_process, back_idx, nd_idx_mx);
-        const int nd_my = il_get(&to_process, back_idx, nd_idx_my);
-        const int nd_sx = il_get(&to_process, back_idx, nd_idx_sx);
-        const int nd_sy = il_get(&to_process, back_idx, nd_idx_sy);
-        const int nd_index = il_get(&to_process, back_idx, nd_idx_index);
-        const int nd_depth = il_get(&to_process, back_idx, nd_idx_depth);
-        const int fc = il_get(&qt->nodes, nd_index, node_idx_fc);
-        il_pop_back(&to_process);
+    while (il_size(to_process) > 0) {
+        const int back_idx = il_size(to_process) - 1;
+        const int nd_mx = il_get(to_process, back_idx, nd_idx_mx);
+        const int nd_my = il_get(to_process, back_idx, nd_idx_my);
+        const int nd_sx = il_get(to_process, back_idx, nd_idx_sx);
+        const int nd_sy = il_get(to_process, back_idx, nd_idx_sy);
+        const int nd_index = il_get(to_process, back_idx, nd_idx_index);
+        const int nd_depth = il_get(to_process, back_idx, nd_idx_depth);
+        const int fc = il_get(qt->nodes, nd_index, node_idx_fc);
+        il_pop_back(to_process);
 
-        if (il_get(&qt->nodes, nd_index, node_idx_num) == -1) {
+        if (il_get(qt->nodes, nd_index, node_idx_num) == -1) {
             // Push the children of the branch to the stack.
             const int hx = nd_sx >> 1, hy = nd_sy >> 1;
             const int l = nd_mx-hx, t = nd_my-hy, r = nd_mx+hx, b = nd_my+hy;
-            push_node(&to_process, fc+0, nd_depth+1, l,t, hx,hy);
-            push_node(&to_process, fc+1, nd_depth+1, r,t, hx,hy);
-            push_node(&to_process, fc+2, nd_depth+1, l,b, hx,hy);
-            push_node(&to_process, fc+3, nd_depth+1, r,b, hx,hy);
+            push_node(to_process, fc+0, nd_depth+1, l,t, hx,hy);
+            push_node(to_process, fc+1, nd_depth+1, r,t, hx,hy);
+            push_node(to_process, fc+2, nd_depth+1, l,b, hx,hy);
+            push_node(to_process, fc+3, nd_depth+1, r,b, hx,hy);
             if (branch) {
                 branch(qt, user_data, nd_index, nd_depth, nd_mx, nd_my, nd_sx, nd_sy);
             }
@@ -408,5 +401,5 @@ void qt_traverse(Quadtree* qt, void* user_data, QtNodeFunc* branch, QtNodeFunc* 
             leaf(qt, user_data, nd_index, nd_depth, nd_mx, nd_my, nd_sx, nd_sy);
         }
     }
-    il_destroy(&to_process);
+    il_destroy(to_process);
 }

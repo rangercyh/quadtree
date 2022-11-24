@@ -3,12 +3,37 @@
 #include <string.h>
 #include <assert.h>
 
-void il_create(IntList* il, int num_fields) {
+struct int_list {
+    // Stores a fixed-size buffer in advance to avoid requiring
+    // a heap allocation until we run out of space.
+    int fixed[il_fixed_cap];
+
+    // Points to the buffer used by the list. Initially this will
+    // point to 'fixed'.
+    int* data;
+
+    // Stores how many integer fields each element has.
+    int num_fields;
+
+    // Stores the number of elements in the list.
+    int num;
+
+    // Stores the capacity of the array.
+    int cap;
+
+    // Stores an index to the free element or -1 if the free list
+    // is empty.
+    int free_element;
+};
+
+IntList * il_create(int num_fields) {
+    IntList *il = (IntList *)malloc(sizeof(IntList));
     il->data = il->fixed;
     il->num = 0;
     il->cap = il_fixed_cap;
     il->num_fields = num_fields;
     il->free_element = -1;
+    return il;
 }
 
 void il_destroy(IntList* il) {
@@ -16,6 +41,7 @@ void il_destroy(IntList* il) {
     if (il->data != il->fixed) {
         free(il->data);
     }
+    free(il);
 }
 
 void il_clear(IntList* il) {
@@ -23,11 +49,11 @@ void il_clear(IntList* il) {
     il->free_element = -1;
 }
 
-int il_size(const IntList* il) {
+int il_size(IntList* il) {
     return il->num;
 }
 
-int il_get(const IntList* il, int n, int field) {
+int il_get(IntList* il, int n, int field) {
     assert(n >= 0 && n < il->num);
     return il->data[n*il->num_fields + field];
 }
