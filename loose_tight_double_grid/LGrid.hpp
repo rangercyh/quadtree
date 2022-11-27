@@ -4,7 +4,7 @@
 #ifndef LGRID_HPP
 #define LGRID_HPP
 
-#include "SmallList.hpp"
+#include "../small_list/SmallList.hpp"
 
 struct LGridQuery4
 {
@@ -123,11 +123,6 @@ void lgrid_move(LGrid* grid, int id, float prev_mx, float prev_my, float mx, flo
 // Returns all the element IDs that intersect the specified rectangle excluding elements
 // with the specified ID to omit.
 SmallList<int> lgrid_query(const LGrid* grid, float mx, float my, float hx, float hy, int omit_id);
-
-// Returns all the element IDs that intersect the specified 4 rectangles excluding elements
-// with the specified IDs to omit.
-LGridQuery4 lgrid_query4(const LGrid* grid, const SimdVec4f* mx4, const SimdVec4f* my4,
-                         const SimdVec4f* hx4, const SimdVec4f* hy4, const SimdVec4i* omit_id4);
 
 // Returns true if the specified rectangle is inside the grid boundaries.
 bool lgrid_in_bounds(const LGrid* grid, float mx, float my, float hx, float hy);
