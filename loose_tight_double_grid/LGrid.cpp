@@ -51,13 +51,13 @@ static float clampf(float num, float min, float max) {
     return num > max ? max : num < min ? min : num;
 }
 
+static int intersects(const float rect[4], const float other[4]) {
+    return rect[2] >= other[0] && rect[1] >= other[3] && other[2] >= rect[0] && other[1] >= rect[3];
+}
+
 struct rect {
     float data[4];
 };
-
-static int intersects(struct rect rect, const float other[4]) {
-    return rect.data[2] >= other[0] && rect.data[1] >= other[3] && other[2] >= rect.data[0] && other[3] >= rect.data[1];
-}
 
 static struct rect to_tcell_idx4(const LGrid* grid, float min_x, float min_y, float max_x, float max_y)
 {
@@ -290,8 +290,8 @@ SmallList<int> lgrid_query(const LGrid* grid, float mx, float my, float hx, floa
     my -= grid->y;
 
     // Compute the tight cell extents [min_tx, min_ty, max_tx, max_ty].
-    const struct rect qrect = (struct rect){ .data = {mx-hx, my-hy, mx+hx, my+hy} };
-    const struct rect trect = to_tcell_idx4(grid, qrect.data[0], qrect.data[1], qrect.data[2], qrect.data[3]);
+    const float qrect[4] = {mx-hx, my-hy, mx+hx, my+hy};
+    const struct rect trect = to_tcell_idx4(grid, qrect[0], qrect[1], qrect[2], qrect[3]);
 
     // Gather the intersecting loose cells in the tight cells that intersect.
     SmallList<int> lcell_idxs;
