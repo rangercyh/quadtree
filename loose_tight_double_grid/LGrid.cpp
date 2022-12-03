@@ -52,7 +52,7 @@ static float clampf(float num, float min, float max) {
 }
 
 static int intersects(const float rect[4], const float other[4]) {
-    return rect[2] >= other[0] && rect[1] >= other[3] && other[2] >= rect[0] && other[1] >= rect[3];
+    return rect[0] <= other[2] && rect[2] >= other[0] && rect[1] <= other[3] && rect[3] >= other[1];
 }
 
 struct rect {
