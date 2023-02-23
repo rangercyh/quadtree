@@ -49,8 +49,8 @@ UGrid* ugrid_create(float radius, float cell_w, float cell_h,
     grid->inv_cell_h = 1.0f / cell_w;
     grid->x = l;
     grid->y = t;
-    grid->h = w;
-    grid->w = h;
+    grid->h = h;
+    grid->w = w;
     grid->radius = radius;
 
     grid->rows = new UGridRow[num_rows];

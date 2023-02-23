@@ -165,8 +165,8 @@ LGrid* lgrid_create(float lcell_w, float lcell_h, float tcell_w, float tcell_h,
     grid->num_elts = 0;
     grid->x = l;
     grid->y = t;
-    grid->h = w;
-    grid->w = h;
+    grid->h = h;
+    grid->w = w;
 
     grid->loose.num_cols = num_lcols;
     grid->loose.num_rows = num_lrows;
